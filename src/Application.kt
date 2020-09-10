@@ -7,7 +7,9 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.request.*
 import java.net.URI
+import java.text.DateFormat
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -19,8 +21,10 @@ fun Application.module(testing: Boolean = false) {
             gson {
                 disableHtmlEscaping()
                 setPrettyPrinting()
+                setDateFormat(DateFormat.LONG)
             }
         }
+        install(CORS)
         static {
             defaultResource("index.html", "web")
             // /resource/web/ 下面的所有文件
@@ -38,6 +42,17 @@ fun Application.module(testing: Boolean = false) {
             val id = call.parameters["id"]
             println("id = $id")
             call.resolveResource("${id}.css", "web")?.let { call.respond(it) }
+        }
+
+        //http://localhost:8080/object/1?name=123
+        get("/object/{id}") {
+            val data: SimpleData = SimpleData(
+                call.parameters["id"]?.toLong() ?: 0L,
+                call.parameters["name"] ?: ""
+            )
+            println("simple date = $data")
+            //json data
+            call.respond(data)
         }
     }
 }
