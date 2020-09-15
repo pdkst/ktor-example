@@ -54,5 +54,10 @@ fun Application.module(testing: Boolean = false) {
             //json data
             call.respond(data)
         }
+
+        //http://localhost:8080/redirect
+        get("/redirect") {
+            call.respondRedirect("http://www.baidu.com", permanent = true)
+        }
     }
 }
